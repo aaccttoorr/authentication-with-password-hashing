@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+  >
+  <meta
+    http-equiv="X-UA-Compatible"
+    content="ie=edge"
+  >
+  <link
+    rel="stylesheet"
+    href="./assets/styles/style.css"
+  >
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/bcryptjs@3.0.2/umd/index.min.js"
+  ></script>
+  <script
+    type="module"
+    src="./assets/scripts/main.js"
+  ></script>
+  <title>Auth Lab</title>
+</head>
+<body>
+<main class="main">
+  <section class="authentication">
+    <h1 class="authentication__title">
+      Система аутентификации с хэшированием паролей
+    </h1>
+    <div class="authentication__forms">
+      <form
+        class="authentication__registration form"
+        data-registration-form
+      >
+        <div class="form__control">
+          <label
+            for="login-registration"
+            class="form__label"
+          >
+            Логин
+          </label>
+          <input
+            class="form__input"
+            id="login-registration"
+            name="login-registration"
+            type="text"
+            required
+            data-registration-form-login
+          />
+        </div>
+        <div class="form__control">
+          <label
+            for="password-registration"
+            class="form__label"
+          >
+            Пароль
+          </label>
+          <input
+            class="form__input"
+            id="password-registration"
+            name="password-registration"
+            type="password"
+            required
+            data-registration-form-password
+          />
+        </div>
+        <button
+          class="form__button"
+          type="button"
+          data-registration-form-button
+        >
+          Зарегистрироваться
+        </button>
+        <span
+          class="authentication__message"
+          data-registration-form-message
+        ></span>
+      </form>
+      <form
+        class="authentication__authorization form"
+        data-authorization-form
+      >
+        <div class="form__control">
+          <label
+            for="login-authorization"
+            class="form__label"
+          >
+            Логин
+          </label>
+          <input
+            class="form__input"
+            id="login-authorization"
+            name="login-authorization"
+            type="text"
+            required
+            data-authorization-form-login
+          />
+        </div>
+        <div class="form__control">
+          <label
+            for="password-authorization"
+            class="form__label"
+          >
+            Пароль
+          </label>
+          <input
+            class="form__input"
+            id="password-authorization"
+            name="password-authorization"
+            type="password"
+            required
+            data-authorization-form-password
+          />
+        </div>
+        <button
+          class="form__button"
+          type="button"
+          data-authorization-form-button
+        >
+          Войти
+        </button>
+        <span
+          class="authentication__message"
+          data-authorization-form-message
+        ></span>
+      </form>
+    </div>
+  </section>
+</main>
+</body>
+</html>
