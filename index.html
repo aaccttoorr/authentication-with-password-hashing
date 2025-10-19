@@ -14,41 +14,52 @@
     rel="stylesheet"
     href="./assets/styles/style.css"
   >
-  <script
-    defer
-    src="https://cdn.jsdelivr.net/npm/bcryptjs@3.0.2/umd/index.min.js"
-  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script
     type="module"
     src="./assets/scripts/main.js"
   ></script>
-  <title>Auth Lab</title>
+  <title>Auth Lab with Supabase</title>
 </head>
 <body>
 <main class="main">
   <section class="authentication">
     <h1 class="authentication__title">
-      Система аутентификации с хэшированием паролей
+      Система аутентификации с Supabase
     </h1>
-    <div class="authentication__forms">
+
+    <div class="user-info" style="display: none;" data-user-info>
+      <h2>Добро пожаловать!</h2>
+      <p>Email: <span class="user-email" data-user-email></span></p>
+      <button
+        class="form__button"
+        type="button"
+        data-logout-button
+      >
+        Выйти
+      </button>
+    </div>
+
+    <div class="authentication__forms" data-auth-forms>
       <form
         class="authentication__registration form"
         data-registration-form
       >
+        <h2>Регистрация</h2>
         <div class="form__control">
           <label
-            for="login-registration"
+            for="email-registration"
             class="form__label"
           >
-            Логин
+            Email
           </label>
           <input
             class="form__input"
-            id="login-registration"
-            name="login-registration"
-            type="text"
+            id="email-registration"
+            name="email-registration"
+            type="email"
             required
-            data-registration-form-login
+            data-registration-form-email
           />
         </div>
         <div class="form__control">
@@ -64,12 +75,13 @@
             name="password-registration"
             type="password"
             required
+            minlength="6"
             data-registration-form-password
           />
         </div>
         <button
           class="form__button"
-          type="button"
+          type="submit"
           data-registration-form-button
         >
           Зарегистрироваться
@@ -79,24 +91,26 @@
           data-registration-form-message
         ></span>
       </form>
+
       <form
         class="authentication__authorization form"
         data-authorization-form
       >
+        <h2>Авторизация</h2>
         <div class="form__control">
           <label
-            for="login-authorization"
+            for="email-authorization"
             class="form__label"
           >
-            Логин
+            Email
           </label>
           <input
             class="form__input"
-            id="login-authorization"
-            name="login-authorization"
-            type="text"
+            id="email-authorization"
+            name="email-authorization"
+            type="email"
             required
-            data-authorization-form-login
+            data-authorization-form-email
           />
         </div>
         <div class="form__control">
@@ -117,7 +131,7 @@
         </div>
         <button
           class="form__button"
-          type="button"
+          type="submit"
           data-authorization-form-button
         >
           Войти

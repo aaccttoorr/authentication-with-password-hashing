@@ -1,71 +1,75 @@
 export class RegistrationUI {
-  selectors = {
-    root: '[data-registration-form]',
-    loginInput: '[data-registration-form-login]',
-    passwordInput: '[data-registration-form-password]',
-    button: '[data-registration-form-button]',
-    message: '[data-registration-form-message]',
-  }
-
-  stateClasses = {
-    isVisible: 'is-visible',
-  }
-
   constructor(registrationService) {
     this.registrationService = registrationService
-    this.rootElement = document.querySelector(this.selectors.root)
-    if (!this.rootElement) return
-
-    this.loginInputElement = this.rootElement.querySelector(this.selectors.loginInput)
-    this.passwordInputElement = this.rootElement.querySelector(this.selectors.passwordInput)
-    this.buttonElement = this.rootElement.querySelector(this.selectors.button)
-    this.messageElement = this.rootElement.querySelector(this.selectors.message)
-
-    this.bindEvents()
+    this.init()
   }
 
-  handleRegistration = async () => {
-    const username = this.loginInputElement.value.trim()
-    const password = this.passwordInputElement.value.trim()
+  init() {
+    const form = document.querySelector('[data-registration-form]')
+    const emailInput = document.querySelector('[data-registration-form-email]')
+    const passwordInput = document.querySelector('[data-registration-form-password]')
+    const button = document.querySelector('[data-registration-form-button]')
+    const message = document.querySelector('[data-registration-form-message]')
 
-    this.clearMessage()
+    if (form) {
+      form.addEventListener('submit', this.handleRegistration.bind(this))
+    }
+
+    this.elements = { emailInput, passwordInput, button, message }
+  }
+
+  async handleRegistration(event) {
+    event.preventDefault()
+
+    const email = this.elements.emailInput?.value
+    const password = this.elements.passwordInput?.value
+
+    console.log('Form data:', { email, password })
+
+    if (!this.elements.message) {
+      return
+    }
 
     try {
-      const response = await this.registrationService.registerUser({
-        username,
-        password
+      this.showMessage('Регистрация...', 'info')
+
+      const result = await this.registrationService.registerUser({
+        email: email,
+        password: password
       })
 
-      this.showMessage(response.message, 'success')
-      this.clearForm()
 
-      setTimeout(() => this.clearMessage(), 1500)
-    } catch (e) {
-      this.showMessage(e.message, 'error')
-      setTimeout(() => this.clearMessage(), 1500)
+      this.showMessage(result.message, result.success ? 'success' : 'error')
+
+      if (result.success) {
+        if (this.elements.emailInput) this.elements.emailInput.value = ''
+        if (this.elements.passwordInput) this.elements.passwordInput.value = ''
+      }
+
+    } catch (error) {
+      this.showMessage('Ошибка регистрации: ' + error.message, 'error')
     }
   }
 
-  showMessage = (message) => {
-    if (this.messageElement) {
-      this.messageElement.textContent = ''
-      this.messageElement.textContent = message
-      this.messageElement.classList.add(this.stateClasses.isVisible)
+  showMessage(text, type = 'info') {
+
+    if (!this.elements.message) {
+      return
     }
-  }
 
-  clearMessage = () => {
-    if (this.messageElement) {
-      this.messageElement.classList.remove(this.stateClasses.isVisible)
-    }
-  }
+    this.elements.message.textContent = text
+    this.elements.message.className = 'authentication__message'
 
-  clearForm = () => {
-    this.loginInputElement.value = ''
-    this.passwordInputElement.value = ''
-  }
+    const typeClass = `authentication__message--${type}`
+    this.elements.message.classList.add(typeClass)
 
-  bindEvents() {
-    this.buttonElement.addEventListener('click', this.handleRegistration)
+    this.elements.message.classList.add('is-visible')
+
+    setTimeout(() => {
+      if (this.elements.message) {
+        this.elements.message.classList.remove('is-visible')
+
+      }
+    }, 5000)
   }
 }

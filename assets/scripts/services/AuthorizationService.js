@@ -1,22 +1,39 @@
 export class AuthorizationService {
-  constructor(userRepository, cryptoService) {
-    this.userRepository = userRepository
-    this.cryptoService = cryptoService
+  constructor(supabaseService) {
+    this.supabaseService = supabaseService
   }
 
   authorize = async (data) => {
-    if (!data.username || !data.password) throw new Error('Логин и пароль обязательны!')
+    if (!data.email || !data.password) throw new Error('Email и пароль обязательны!')
 
-    const user = this.userRepository.findByUsername(data.username)
-    if (!user) throw new Error('Пользователь не найден!')
+    try {
+      const result = await this.supabaseService.signIn(data.email, data.password)
 
-    const isPasswordValid = await this.cryptoService.comparePassword(data.password, user.passwordHash)
-    if (!isPasswordValid) throw new Error('Неверный пароль!')
+      return {
+        success: true,
+        message: 'Вход выполнен успешно!',
+        user: result.user,
+        session: result.session
+      }
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  }
 
-    return {
-      success: true,
-      message: 'Вход выполнен успешно!',
-      user: { id: user.id, username: user.username }
+  signOut = async () => {
+    try {
+      await this.supabaseService.signOut()
+      return { success: true, message: 'Выход выполнен успешно!' }
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  getCurrentUser = async () => {
+    try {
+      return await this.supabaseService.getCurrentUser()
+    } catch (error) {
+      return null
     }
   }
 }

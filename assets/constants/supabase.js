@@ -1,0 +1,2 @@
+export const PROJECT_URL = 'https://goeicjjtjccikmnvvdks.supabase.co'
+export const API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvZWljamp0amNjaWttbnZ2ZGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NDA4ODgsImV4cCI6MjA3NjQxNjg4OH0.OKYVmdLrfMrUdgTO_hSPNn-sBT8aAw5PJUZHdzmLDbM'

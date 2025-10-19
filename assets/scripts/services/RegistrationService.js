@@ -1,26 +1,38 @@
 export class RegistrationService {
-  constructor(userRepository, cryptoService) {
-    this.userRepository = userRepository
-    this.cryptoService = cryptoService
+  constructor(supabaseService) {
+    this.supabaseService = supabaseService
   }
 
   registerUser = async (data) => {
-    if (!data.username || !data.password) throw new Error('Логин и пароль обязательны!')
+    if (!data.email || !data.password) throw new Error('Email и пароль обязательны!')
     if (data.password.length < 6) throw new Error('Пароль не может быть меньше 6 символов!')
 
-    const existingUser = this.userRepository.findByUsername(data.username)
-    if (existingUser) throw new Error('Пользователь уже существует!')
+    try {
+      const result = await this.supabaseService.signUp(data.email, data.password)
 
-    const passwordHash = await this.cryptoService.hashPassword(data.password)
+      console.log('Supabase response:', result)
 
-    const user = await this.userRepository.createUser({
-      username: data.username,
-      passwordHash: passwordHash,
-    })
+      if (result.user?.identities?.length === 0) {
+        return {
+          success: false,
+          message: 'Пользователь с таким email уже существует!'
+        }
+      }
 
-    return {
-      success: true,
-      message: 'Пользователь успешно зарегистрирован',
+      if (result.user && !result.user.user_metadata.email_verified) {
+        return {
+          success: true,
+          message: `Регистрация прошла успешно! Проверьте почту ${result.user.user_metadata.email} для подтверждения регистрации.`
+        }
+      }
+
+      return {
+        success: true,
+        message: 'Регистрация успешна!',
+        user: result.user
+      }
+    } catch (error) {
+      throw new Error(error.message)
     }
   }
 }

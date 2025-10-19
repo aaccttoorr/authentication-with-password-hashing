@@ -1,72 +1,94 @@
 export class AuthorizationUI {
-  selectors = {
-    root: '[data-authorization-form]',
-    loginInput: '[data-authorization-form-login]',
-    passwordInput: '[data-authorization-form-password]',
-    button: '[data-authorization-form-button]',
-    message: '[data-authorization-form-message]'
-  }
-
-  stateClasses = {
-    isVisible: 'is-visible',
-  }
-
   constructor(authorizationService) {
     this.authorizationService = authorizationService
-    this.rootElement = document.querySelector(this.selectors.root)
-
-    if (!this.rootElement) return
-
-    this.loginInputElement = this.rootElement.querySelector(this.selectors.loginInput)
-    this.passwordInputElement = this.rootElement.querySelector(this.selectors.passwordInput)
-    this.buttonElement = this.rootElement.querySelector(this.selectors.button)
-    this.messageElement = this.rootElement.querySelector(this.selectors.message)
-
-    this.bindEvents()
+    this.init()
   }
 
-  handleAuthorization = async () => {
-    const username = this.loginInputElement.value.trim();
-    const password = this.passwordInputElement.value.trim();
+  init() {
 
-    this.clearMessage();
+    const form = document.querySelector('[data-authorization-form]')
+    const emailInput = document.querySelector('[data-authorization-form-email]')
+    const passwordInput = document.querySelector('[data-authorization-form-password]')
+    const button = document.querySelector('[data-authorization-form-button]')
+    const message = document.querySelector('[data-authorization-form-message]')
+    const logoutButton = document.querySelector('[data-logout-button]')
+
+    if (form) {
+      form.addEventListener('submit', this.handleAuthorization.bind(this))
+    }
+
+    if (logoutButton) {
+      logoutButton.addEventListener('click', this.handleLogout.bind(this))
+    }
+
+    this.elements = { emailInput, passwordInput, button, message, logoutButton }
+  }
+
+  async handleAuthorization(event) {
+    event.preventDefault()
+
+    const email = this.elements.emailInput?.value
+    const password = this.elements.passwordInput?.value
+
+    if (!this.elements.message) {
+      return
+    }
 
     try {
-      const response = await this.authorizationService.authorize({
-        username,
-        password
-      });
+      this.showMessage('Вход...', 'info')
 
-      this.showMessage(response.message, 'success');
-      this.clearForm();
+      const result = await this.authorizationService.authorize({
+        email: email,
+        password: password
+      })
 
-      setTimeout(() => this.clearMessage(), 1500)
-    } catch (e) {
-      this.showMessage(e.message, 'error');
-      setTimeout(() => this.clearMessage(), 1500)
+      this.showMessage(result.message, 'success')
+
+      if (this.elements.emailInput) this.elements.emailInput.value = ''
+      if (this.elements.passwordInput) this.elements.passwordInput.value = ''
+
+      window.dispatchEvent(new CustomEvent('authStateChanged'))
+
+    } catch (error) {
+      this.showMessage('Ошибка авторизации: ' + error.message, 'error')
     }
   }
 
-  showMessage = (message) => {
-    if (this.messageElement) {
-      this.messageElement.textContent = ''
-      this.messageElement.textContent = message
-      this.messageElement.classList.add(this.stateClasses.isVisible)
+  async handleLogout() {
+    try {
+      await this.authorizationService.signOut()
+      window.dispatchEvent(new CustomEvent('authStateChanged'))
+    } catch (error) {
+      console.error('Logout error:', error)
     }
   }
 
-  clearMessage = () => {
-    if (this.messageElement) {
-      this.messageElement.classList.remove(this.stateClasses.isVisible)
+  showMessage(text, type = 'info') {
+
+    if (!this.elements.message) {
+      return
     }
-  }
 
-  clearForm = () => {
-    this.loginInputElement.value = ''
-    this.passwordInputElement.value = ''
-  }
+    this.elements.message.textContent = text
+    this.elements.message.className = 'authentication__message'
 
-  bindEvents() {
-    this.buttonElement.addEventListener('click', this.handleAuthorization);
+    switch (type) {
+      case 'success':
+        this.elements.message.classList.add('authentication__message--success', 'is-visible')
+        break
+      case 'error':
+        this.elements.message.classList.add('authentication__message--error', 'is-visible')
+        break
+      default:
+        this.elements.message.classList.add('authentication__message--info', 'is-visible')
+    }
+
+    setTimeout(() => {
+      if (this.elements.message) {
+        this.elements.message.textContent = ''
+        this.elements.message.className = 'authentication__message'
+        this.elements.message.classList.remove('is-visible')
+      }
+    }, 5000)
   }
 }
